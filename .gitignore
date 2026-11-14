@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+_choix_a_faire.json
+_mes_choix.json
+_journal_renommage_plex.csv
+demo/
