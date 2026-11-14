@@ -1,4 +1,5 @@
-"""Cherche les doublons d'une bibliothèque de films nommée à la manière de Plex (« Titre (Année).ext ») et prépare la
+"""Finds duplicates in a Plex-named movie library and prepares the cases for the comparator.
+(FR) Cherche les doublons d'une bibliothèque de films nommée à la manière de Plex (« Titre (Année).ext ») et prépare la
 liste des cas pour le comparateur.
 
 Deux fichiers (ou dossiers de film) sont des doublons s'ils portent le même titre et la même année, sans tenir compte
@@ -46,7 +47,7 @@ for chemins in groupes.values():
     chemins.sort(key=lambda p: (os.path.isdir(p), p.lower()))
     for b in chemins[1:]:                       # 3 copies ou plus : A comparée à chacune des autres
         cas.append({'id': str(len(cas)), 'titre': os.path.splitext(os.path.basename(chemins[0]))[0],
-                    'a': chemins[0], 'b': b, 'note': 'Doublon : deux copies du même film.'})
+                    'a': chemins[0], 'b': b, 'type': 'doublon', 'note': ''})
 
 json.dump(cas, open(sortie, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-print(f'{len(cas)} doublon(s) -> {sortie}')
+print(f'{len(cas)} doublon(s) / duplicate(s) -> {sortie}')
