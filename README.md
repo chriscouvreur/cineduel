@@ -18,6 +18,8 @@ Got several copies of the same movie? This little page helps you **pick the best
   - `Space`: switch between A and B (the best way to judge sharpness)
   - `S`: both side by side
   - `Esc`: close
+
+  ![Full-screen viewer: A and B at the same moment](docs/plein-ecran.jpg)
 - ▶️ **Opens each copy in VLC** at the moment you choose.
 - ⇆ **Side-by-side video**: both movies in one window, in sync.
 - ✅ **"Apply my choices" button**: the copy you don't keep is moved to a `_Doublons` folder. **Nothing is ever deleted**: you empty `_Doublons` yourself, whenever you want.
@@ -136,6 +138,10 @@ Leave `note` empty to get the built-in explanation in the chosen language, or wr
 | `trouver_doublons.py` | finds duplicates and prepares the list |
 | `resolution.py`, `langues.py`, `duree.py`, `codec.py` | read video details when `ffprobe` is missing |
 | `CineDuel.bat` | the double-click launcher |
+
+## Credits
+
+The screenshots use excerpts from *Sintel* (2010) and *Tears of Steel* (2012), open movies by the Blender Foundation, licensed under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) – © Blender Foundation | [durian.blender.org](https://durian.blender.org) | [mango.blender.org](https://mango.blender.org).
 
 ## License
 

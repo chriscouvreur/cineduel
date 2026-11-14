@@ -18,6 +18,8 @@ Tu as plusieurs copies du même film ? Cette petite page t'aide à **choisir la 
   - `Espace` : passer de A à B (le plus parlant pour voir la netteté)
   - `S` : les deux côte à côte
   - `Échap` : fermer
+
+  ![La visionneuse plein écran : A et B au même instant](docs/plein-ecran.jpg)
 - ▶️ **Ouvre chaque copie dans VLC** au moment que tu veux.
 - ⇆ **Côte à côte vidéo** : les deux films dans une seule fenêtre, synchronisés.
 - ✅ **Bouton « Appliquer mes choix »** : la copie que tu ne gardes pas va dans un dossier `_Doublons`. **Rien n'est jamais supprimé** : tu vides `_Doublons` toi-même quand tu veux.
@@ -136,6 +138,10 @@ Laisse `note` vide pour afficher l'explication intégrée dans la langue choisie
 | `trouver_doublons.py` | cherche les doublons et prépare la liste |
 | `resolution.py`, `langues.py`, `duree.py`, `codec.py` | lisent les infos des vidéos si `ffprobe` est absent |
 | `CineDuel.bat` | le lanceur à double-cliquer |
+
+## Crédits
+
+Les captures d'écran utilisent des extraits de *Sintel* (2010) et *Tears of Steel* (2012), films libres de la Blender Foundation, sous licence [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/deed.fr) – © Blender Foundation | [durian.blender.org](https://durian.blender.org) | [mango.blender.org](https://mango.blender.org).
 
 ## Licence
 

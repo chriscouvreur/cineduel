@@ -140,6 +140,18 @@ def capture(c, k, n):
     return f if os.path.exists(f) else None
 
 
+def version(c):
+    """Empreinte des fichiers du cas : change si un fichier change, pour que le navigateur ne réutilise pas d'anciennes captures."""
+    h = hashlib.md5()
+    for k in ('a', 'b'):
+        if c.get(k):
+            try:
+                h.update(f"{c[k]}|{os.path.getmtime(video(c[k]))}".encode())
+            except OSError:
+                h.update(c[k].encode())
+    return h.hexdigest()[:10]
+
+
 def precapturer():
     for c in CAS:
         for n in range(len(MOMENTS)):
@@ -343,8 +355,8 @@ main{max-width:1320px;margin:0 auto;padding:22px 28px 90px}
 .vide{text-align:center;color:var(--m);padding:80px 20px;font-size:16px}.vide b{display:block;font-size:40px;margin-bottom:8px}
 #lb{position:fixed;inset:0;z-index:10;background:#000;display:none;flex-direction:column}#lb.on{display:flex}
 #lb .vue{flex:1;display:flex;gap:4px;min-height:0}
-#lb .vue div{flex:1;display:flex;flex-direction:column;min-width:0}#lb .vue img{flex:1;min-height:0;width:100%;object-fit:contain}
-#lb .lt{font-size:13px;color:#ddd;padding:7px 12px;background:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#lb .vue>div{flex:1;display:flex;flex-direction:column;min-width:0}#lb .vue img{flex:1;min-height:0;width:100%;object-fit:contain}
+#lb .lt{flex:none;font-size:13px;color:#ddd;padding:7px 12px;background:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #lb .bas{display:flex;gap:10px;align-items:center;padding:10px 16px;background:#111;color:#bbb;font-size:13px;flex-wrap:wrap}
 #lb kbd{border:1px solid #444;border-radius:4px;padding:0 5px;font-size:12px;color:#ddd}
 @media (max-width:900px){.cols{grid-template-columns:1fr}.hd{padding:10px 16px}main{padding:16px}}
@@ -384,7 +396,7 @@ const $=s=>document.querySelector(s);
 const post=(u,d)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(r=>r.json());
 const mmss=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 const hms=s=>{const [m,x]=String(s).split(':');return x===undefined?+m*60:(+m)*60+(+x)};
-const src=(n,k,i)=>`/img?c=${CAS[n].id}&k=${k}&n=${i}`;
+const src=(n,k,i)=>`/img?c=${CAS[n].id}&k=${k}&n=${i}&v=${CAS[n].v||''}`;
 const ch=c=>CHOIX[c.id]||{};
 const decide=c=>{const h=ch(c);return !!(h.applique||h.choix||(!c.b&&h.note))};
 // recommandation : mêmes pistes audio -> résolution puis taille corrigée du codec ; sinon format récent, audio FR, .mkv, résolution, taille
@@ -465,7 +477,7 @@ class H(BaseHTTPRequestHandler):
         if self.path == '/api/cas':
             for k in [k for k in INFOS if not os.path.exists(k)]:   # fichiers déplacés par « Appliquer »
                 del INFOS[k]
-            return self.envoyer(json.dumps([dict(c, ia=info(c['a']), ib=info(c['b']) if c.get('b') else None, ts=instants(c))
+            return self.envoyer(json.dumps([dict(c, ia=info(c['a']), ib=info(c['b']) if c.get('b') else None, ts=instants(c), v=version(c))
                                             for c in CAS]))
         if self.path == '/api/choix':
             return self.envoyer(json.dumps(lire_choix()))
