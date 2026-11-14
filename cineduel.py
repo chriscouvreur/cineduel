@@ -1,11 +1,11 @@
-"""Comparateur de films PLEX — page locale pour trancher, au même endroit, tous les doublons et films à identifier d'une bibliothèque.
+"""CinéDuel — page locale pour trancher, au même endroit, tous les doublons et films à identifier d'une bibliothèque.
 
 Pour chaque cas : fiches techniques (résolution, codec, taille, durée, pistes audio), boutons « VLC » pour chaque copie,
 « Côte à côte » (une seule fenêtre ffplay, les deux films synchronisés au même instant, son de A) et captures pleine résolution aux mêmes
 instants pour A et B (agrandissables, bascule A/B). Les choix sont enregistrés dans --choix ; le bouton « Appliquer mes choix » les applique
 (perdants -> _Doublons, jamais de suppression ; film identifié « Titre (Année) » -> renommé ; journal de la bibliothèque).
 
-Usage : python -I comparateur.py --cas cas.json --choix choix.json [--port 8770] [--racine <bibliothèque>] [--appliquer]
+Usage : python -I cineduel.py --cas cas.json --choix choix.json [--port 8770] [--racine <bibliothèque>] [--appliquer]
 cas.json : [{"id": "...", "titre": "...", "a": "chemin", "b": "chemin" (absent = film à identifier), "note": "..."}]
 """
 import argparse, csv, hashlib, json, os, re, subprocess, sys, threading, time, unicodedata, webbrowser
@@ -287,14 +287,14 @@ if a.appliquer:
         print(k, next((c['titre'] for c in CAS if c['id'] == k), ''), '->', v['code'], v.get('nom', ''))
     sys.exit(0)
 
-PAGE = r'''<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Comparateur de films PLEX</title><style>
+PAGE = r'''<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CinéDuel</title><style>
 :root{color-scheme:dark;--bg:#0f1012;--c:#17181c;--c2:#1e2025;--c3:#262830;--t:#ececf1;--m:#9b9ca8;--l:#2c2e36;--a:#e5a00d;--a2:#f4b62a;--ok:#4cc38a;--okf:rgba(76,195,138,.12);--warn:#ffb35c;--warnf:rgba(255,179,92,.12);--r:14px}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--t);-webkit-font-smoothing:antialiased}
 button,input{font:inherit;color:inherit}
 header{position:sticky;top:0;z-index:5;background:rgba(15,16,18,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--l)}
 .hd{max-width:1320px;margin:0 auto;padding:12px 28px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-.01em;white-space:nowrap}
-.logo i{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--a);color:#1a1300;font-style:normal;font-size:15px}
+.logo small{font-weight:500;font-size:12px;color:var(--m)}.logo i{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--a);color:#1a1300;font-style:normal;font-size:15px}
 .prog{display:flex;align-items:center;gap:10px;color:var(--m);font-size:13px;font-variant-numeric:tabular-nums;min-width:170px}
 .barre{flex:1;height:6px;border-radius:9px;background:var(--c3);overflow:hidden;min-width:90px}.barre b{display:block;height:100%;width:0;background:var(--ok);border-radius:9px;transition:width .4s cubic-bezier(.2,.8,.2,1)}
 .sp{flex:1}
@@ -350,7 +350,7 @@ main{max-width:1320px;margin:0 auto;padding:22px 28px 90px}
 @media (max-width:900px){.cols{grid-template-columns:1fr}.hd{padding:10px 16px}main{padding:16px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
 </style></head><body>
-<header><div class="hd"><div class="logo"><i>▶</i><span data-t="titre"></span></div>
+<header><div class="hd"><div class="logo"><i>⚔</i><span data-t="titre"></span><small data-t="sous"></small></div>
 <div class="prog"><span id="compte"></span><div class="barre"><b id="barre"></b></div></div>
 <div class="seg" id="filtres"></div><span class="sp"></span>
 <div class="seg" id="langues"><button data-l="fr">FR</button><button data-l="en">EN</button></div>
@@ -360,7 +360,7 @@ main{max-width:1320px;margin:0 auto;padding:22px 28px 90px}
 <button class="btn" onclick="bascule()">A ⇄ B</button><button class="btn" onclick="mode()" data-t="lbcote"></button><button class="btn" onclick="fermer()" data-t="fermer"></button></div></div>
 <script>
 const T={
-fr:{titre:'Comparateur de films PLEX',enregistrer:'Enregistrer',enregistre:'enregistré ✓',appliquer:'Appliquer mes choix',atrancher:'À trancher',appliques:'Appliqués',tous:'Tous',
+fr:{titre:'CinéDuel',sous:'pour Plex et Jellyfin',enregistrer:'Enregistrer',enregistre:'enregistré ✓',appliquer:'Appliquer mes choix',atrancher:'À trancher',appliques:'Appliqués',tous:'Tous',
  compte:'{n} / {t} tranchés',dup:'Doublon',ident:'À identifier',fait:'Appliqué',reco:'Recommandé',lecture:'Lecture à',vlc:'▶ VLC',cote:'⇆ Côte à côte (vidéo)',
  garderA:'Garder A',garderB:'Garder B',garderDeux:'Garder les deux',jsp:'Je ne sais pas',versDbl:'Mettre dans _Doublons',remarque:'Remarque (facultatif)',quel:'Quel film est-ce ? Titre (Année)',
  dans:'dans',extraction:'extraction…',lbaide:'<kbd>←</kbd><kbd>→</kbd> instant · <kbd>Espace</kbd> A/B · <kbd>S</kbd> côte à côte · <kbd>Échap</kbd> fermer',lbcote:'Côte à côte',fermer:'Fermer',
@@ -368,7 +368,7 @@ fr:{titre:'Comparateur de films PLEX',enregistrer:'Enregistrer',enregistre:'enre
  vide:'Tout est tranché',videTous:'Aucun cas',noteDup:'Deux copies du même film : compare-les et garde la meilleure.',noteId:'Film non identifié : regarde un passage et écris son titre si tu le reconnais.',noteDeja:'Tu as identifié B comme « {nom} », déjà présent dans la bibliothèque (A) : c\'est un doublon.',
  r_garde:'Gardé : {nom} · l\'autre → _Doublons',r_deux:'Les deux copies sont gardées',r_introuvable:'Fichier introuvable (déjà déplacé ?)',r_doublons:'Mis dans _Doublons',r_annee:'« {nom} » : il manque l\'année, écris « Titre (Année) »',r_deja:'Déjà présent ({nom}) : ajouté comme doublon à comparer',r_renomme:'Renommé : {nom}',r_erreur:'Non appliqué : {nom}',
  w_h:'meilleure résolution',w_eq:'plus de détail (taille corrigée selon le codec)',w_fmt:'format plus récent que .avi',w_fr:'piste audio française',w_mkv:'conteneur .mkv',min:'min',audio:'audio'},
-en:{titre:'PLEX Movie Comparator',enregistrer:'Save',enregistre:'saved ✓',appliquer:'Apply my choices',atrancher:'To decide',appliques:'Applied',tous:'All',
+en:{titre:'CinéDuel',sous:'for Plex & Jellyfin',enregistrer:'Save',enregistre:'saved ✓',appliquer:'Apply my choices',atrancher:'To decide',appliques:'Applied',tous:'All',
  compte:'{n} / {t} decided',dup:'Duplicate',ident:'To identify',fait:'Applied',reco:'Recommended',lecture:'Play at',vlc:'▶ VLC',cote:'⇆ Side by side (video)',
  garderA:'Keep A',garderB:'Keep B',garderDeux:'Keep both',jsp:'I don\'t know',versDbl:'Move to _Doublons',remarque:'Note (optional)',quel:'Which movie is it? Title (Year)',
  dans:'in',extraction:'extracting…',lbaide:'<kbd>←</kbd><kbd>→</kbd> moment · <kbd>Space</kbd> A/B · <kbd>S</kbd> side by side · <kbd>Esc</kbd> close',lbcote:'Side by side',fermer:'Close',

@@ -1,10 +1,12 @@
-# 🎬 PLEX Movie Comparator
+# ⚔ CinéDuel
+
+**Compare your duplicate movies for Plex and Jellyfin.**
 
 **English** · [Français](README.fr.md)
 
 Got several copies of the same movie? This little page helps you **pick the best one** and tidy up your Plex (or Jellyfin) library.
 
-![The comparator in English](docs/apercu-en.jpg)
+![CinéDuel in English](docs/apercu-en.jpg)
 
 ## What it does
 
@@ -58,18 +60,18 @@ If it asks you a question, type **`Y`** and press **Enter** ↵: it means "yes".
 
 Then **close** the window. Installation done! 🎉
 
-### 3. Get the comparator 📦
+### 3. Get CinéDuel 📦
 
 - At the top of this GitHub page, click the green **`<> Code`** button.
 - Click **`Download ZIP`**.
 - Go to your **Downloads**, right-click the ZIP file, then **`Extract All…`** and **`Extract`**.
 
-You now have a **`comparateur-films-plex`** folder. 📁
+You now have a **`cineduel-main`** folder. 📁
 
 ### 4. Start it ▶️
 
-- Open the `comparateur-films-plex` folder.
-- Double-click **`lancer.bat`** ("lancer" means "start").
+- Open the `cineduel-main` folder.
+- Double-click **`CineDuel.bat`**.
 - It asks where your movies are: type the folder path (for example **`D:\Movies`**), then **Enter** ↵.
 
 Tip: in File Explorer, click the address bar at the top of your movies folder, copy the path and paste it.
@@ -97,7 +99,7 @@ A movie can also live in its own folder: `Title (Year)\Title (Year).mkv`.
 
 ```
 python -I trouver_doublons.py "D:\Movies"
-python -I comparateur.py --cas "D:\Movies\_choix_a_faire.json" --choix "D:\Movies\_mes_choix.json"
+python -I cineduel.py --cas "D:\Movies\_choix_a_faire.json" --choix "D:\Movies\_mes_choix.json"
 ```
 
 | Option | What it does |
@@ -130,11 +132,14 @@ Leave `note` empty to get the built-in explanation in the chosen language, or wr
 
 | File | Role |
 |---|---|
-| `comparateur.py` | the page and its small local server |
+| `cineduel.py` | the page and its small local server |
 | `trouver_doublons.py` | finds duplicates and prepares the list |
 | `resolution.py`, `langues.py`, `duree.py`, `codec.py` | read video details when `ffprobe` is missing |
-| `lancer.bat` | the double-click launcher |
+| `CineDuel.bat` | the double-click launcher |
 
 ## License
+
+CinéDuel is an independent project, not affiliated with Plex Inc. or Jellyfin.
+
 
 MIT: you can use, modify and share it freely.

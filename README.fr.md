@@ -1,10 +1,12 @@
-# 🎬 Comparateur de films PLEX
+# ⚔ CinéDuel
+
+**Compare tes doublons de films pour Plex et Jellyfin.**
 
 [English](README.md) · **Français**
 
 Tu as plusieurs copies du même film ? Cette petite page t'aide à **choisir la meilleure** et à ranger ta bibliothèque Plex (ou Jellyfin).
 
-![Le comparateur en français](docs/apercu-fr.jpg)
+![CinéDuel en français](docs/apercu-fr.jpg)
 
 ## Ce qu'il fait
 
@@ -58,18 +60,18 @@ Si elle te pose une question, écris **`O`** (ou **`Y`**) puis **Entrée** ↵ :
 
 Ensuite **ferme** la fenêtre. C'est fini pour l'installation ! 🎉
 
-### 3. Récupère le comparateur 📦
+### 3. Récupère CinéDuel 📦
 
 - Tout en haut de cette page GitHub, clique sur le bouton vert **`<> Code`**.
 - Clique sur **`Download ZIP`**.
 - Va dans tes **Téléchargements**, fais un clic droit sur le fichier ZIP, puis **`Extraire tout…`** et **`Extraire`**.
 
-Tu as maintenant un dossier **`comparateur-films-plex`**. 📁
+Tu as maintenant un dossier **`cineduel-main`**. 📁
 
 ### 4. Lance-le ▶️
 
-- Ouvre le dossier `comparateur-films-plex`.
-- Double-clique sur **`lancer.bat`**.
+- Ouvre le dossier `cineduel-main`.
+- Double-clique sur **`CineDuel.bat`**.
 - Il te demande où sont tes films : écris le chemin du dossier (par exemple **`D:\Films`**), puis **Entrée** ↵.
 
 Astuce : dans l'Explorateur, clique sur la barre d'adresse en haut du dossier de tes films, copie le chemin et colle-le.
@@ -97,7 +99,7 @@ Un film peut aussi être dans son propre dossier : `Titre (Année)\Titre (Année
 
 ```
 python -I trouver_doublons.py "D:\Films"
-python -I comparateur.py --cas "D:\Films\_choix_a_faire.json" --choix "D:\Films\_mes_choix.json"
+python -I cineduel.py --cas "D:\Films\_choix_a_faire.json" --choix "D:\Films\_mes_choix.json"
 ```
 
 | Option | Rôle |
@@ -130,11 +132,14 @@ Laisse `note` vide pour afficher l'explication intégrée dans la langue choisie
 
 | Fichier | Rôle |
 |---|---|
-| `comparateur.py` | la page et son petit serveur local |
+| `cineduel.py` | la page et son petit serveur local |
 | `trouver_doublons.py` | cherche les doublons et prépare la liste |
 | `resolution.py`, `langues.py`, `duree.py`, `codec.py` | lisent les infos des vidéos si `ffprobe` est absent |
-| `lancer.bat` | le lanceur à double-cliquer |
+| `CineDuel.bat` | le lanceur à double-cliquer |
 
 ## Licence
+
+CinéDuel est un projet indépendant, sans lien avec Plex Inc. ni Jellyfin.
+
 
 MIT : tu peux l'utiliser, le modifier et le partager librement.
