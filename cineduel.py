@@ -376,7 +376,7 @@ fr:{titre:'CinéDuel',sous:'pour Plex et Jellyfin',enregistrer:'Enregistrer',enr
  compte:'{n} / {t} tranchés',dup:'Doublon',ident:'À identifier',fait:'Appliqué',reco:'Recommandé',lecture:'Lecture à',vlc:'▶ VLC',cote:'⇆ Côte à côte (vidéo)',
  garderA:'Garder A',garderB:'Garder B',garderDeux:'Garder les deux',jsp:'Je ne sais pas',versDbl:'Mettre dans _Doublons',remarque:'Remarque (facultatif)',quel:'Quel film est-ce ? Titre (Année)',
  dans:'dans',extraction:'extraction…',lbaide:'<kbd>←</kbd><kbd>→</kbd> instant · <kbd>Espace</kbd> A/B · <kbd>S</kbd> côte à côte · <kbd>Échap</kbd> fermer',lbcote:'Côte à côte',fermer:'Fermer',
- confirmer:'Appliquer {n} choix ?\n\nLes copies écartées iront dans _Doublons (rien n\'est supprimé) ; les films identifiés seront renommés.',rien:'Aucun choix à appliquer.',encours:'application en cours…',traites:'{n} cas traité(s) ✓',
+ confirmer:'Appliquer {n} choix ?\n\nLes copies écartées iront dans _Doublons (rien n\'est supprimé) ; les films identifiés seront renommés.',encore:'Cliquer encore pour appliquer {n} choix',rien:'Aucun choix à appliquer.',encours:'application en cours…',traites:'{n} cas traité(s) ✓',
  vide:'Tout est tranché',videTous:'Aucun cas',noteDup:'Deux copies du même film : compare-les et garde la meilleure.',noteId:'Film non identifié : regarde un passage et écris son titre si tu le reconnais.',noteDeja:'Tu as identifié B comme « {nom} », déjà présent dans la bibliothèque (A) : c\'est un doublon.',
  r_garde:'Gardé : {nom} · l\'autre → _Doublons',r_deux:'Les deux copies sont gardées',r_introuvable:'Fichier introuvable (déjà déplacé ?)',r_doublons:'Mis dans _Doublons',r_annee:'« {nom} » : il manque l\'année, écris « Titre (Année) »',r_deja:'Déjà présent ({nom}) : ajouté comme doublon à comparer',r_renomme:'Renommé : {nom}',r_erreur:'Non appliqué : {nom}',
  w_h:'meilleure résolution',w_eq:'plus de détail (taille corrigée selon le codec)',w_fmt:'format plus récent que .avi',w_fr:'piste audio française',w_mkv:'conteneur .mkv',min:'min',audio:'audio'},
@@ -384,7 +384,7 @@ en:{titre:'CinéDuel',sous:'for Plex & Jellyfin',enregistrer:'Save',enregistre:'
  compte:'{n} / {t} decided',dup:'Duplicate',ident:'To identify',fait:'Applied',reco:'Recommended',lecture:'Play at',vlc:'▶ VLC',cote:'⇆ Side by side (video)',
  garderA:'Keep A',garderB:'Keep B',garderDeux:'Keep both',jsp:'I don\'t know',versDbl:'Move to _Doublons',remarque:'Note (optional)',quel:'Which movie is it? Title (Year)',
  dans:'in',extraction:'extracting…',lbaide:'<kbd>←</kbd><kbd>→</kbd> moment · <kbd>Space</kbd> A/B · <kbd>S</kbd> side by side · <kbd>Esc</kbd> close',lbcote:'Side by side',fermer:'Close',
- confirmer:'Apply {n} choice(s)?\n\nDiscarded copies will go to _Doublons (nothing is deleted); identified movies will be renamed.',rien:'Nothing to apply.',encours:'applying…',traites:'{n} case(s) done ✓',
+ confirmer:'Apply {n} choice(s)?\n\nDiscarded copies will go to _Doublons (nothing is deleted); identified movies will be renamed.',encore:'Click again to apply {n} choice(s)',rien:'Nothing to apply.',encours:'applying…',traites:'{n} case(s) done ✓',
  vide:'Everything is decided',videTous:'No cases',noteDup:'Two copies of the same movie: compare them and keep the best one.',noteId:'Unidentified movie: watch a bit and type its title if you recognise it.',noteDeja:'You identified B as “{nom}”, which is already in the library (A): it is a duplicate.',
  r_garde:'Kept: {nom} · the other → _Doublons',r_deux:'Both copies kept',r_introuvable:'File not found (already moved?)',r_doublons:'Moved to _Doublons',r_annee:'“{nom}”: the year is missing, type “Title (Year)”',r_deja:'Already there ({nom}): added as a duplicate to compare',r_renomme:'Renamed: {nom}',r_erreur:'Not applied: {nom}',
  w_h:'higher resolution',w_eq:'more detail (codec-adjusted size)',w_fmt:'newer format than .avi',w_fr:'French audio track',w_mkv:'.mkv container',min:'min',audio:'audio'}};
@@ -442,7 +442,11 @@ function vlc(n,k){post('/api/vlc',{p:CAS[n][k],t:hms($('#t'+n).value)})}
 function cote(n){post('/api/cote',{a:CAS[n].a,b:CAS[n].b,t:hms($('#t'+n).value)})}
 function charger(){return Promise.all([fetch('/api/cas').then(r=>r.json()),fetch('/api/choix').then(r=>r.json())]).then(([c,h])=>{CHOIX=h;CAS=c;rendre()})}
 async function appliquer(){const n=CAS.filter(c=>{const h=ch(c);return !h.applique&&(['A','B','doublons','les deux'].includes(h.choix)||(!c.b&&h.note))}).length;
- if(!n){alert(t('rien'));return}if(!confirm(t('confirmer',{n})))return;
+ const b=$('#appl');if(!n){$('#compte').textContent=t('rien');return}
+ // confirmation sur le bouton lui-même (les fenêtres confirm() sont bloquées dans certains navigateurs intégrés)
+ if(!b.dataset.arme){b.dataset.arme=1;b.textContent=t('encore',{n});b.title=t('confirmer',{n});
+  clearTimeout(b._t);b._t=setTimeout(()=>{delete b.dataset.arme;b.textContent=t('appliquer');b.title=''},6000);return}
+ clearTimeout(b._t);delete b.dataset.arme;b.textContent=t('appliquer');b.title='';b.disabled=true;
  clearTimeout(tm);await post('/api/choix',CHOIX);$('#compte').textContent=t('encours');RES=await post('/api/appliquer',{});await charger();
  $('#compte').textContent+=' · '+t('traites',{n:Object.keys(RES).length});const k=Object.keys(RES).find(i=>!(CHOIX[i]||{}).applique);
  if(k)document.getElementById('c'+CAS.findIndex(c=>c.id===k))?.scrollIntoView({behavior:'smooth',block:'center'})}
@@ -475,8 +479,8 @@ class H(BaseHTTPRequestHandler):
         if self.path == '/':
             return self.envoyer(PAGE, 'text/html')
         if self.path == '/api/cas':
-            for k in [k for k in INFOS if not os.path.exists(k)]:   # fichiers déplacés par « Appliquer »
-                del INFOS[k]
+            for k in [k for k in list(INFOS) if not os.path.exists(k)]:   # fichiers déplacés par « Appliquer »
+                INFOS.pop(k, None)
             return self.envoyer(json.dumps([dict(c, ia=info(c['a']), ib=info(c['b']) if c.get('b') else None, ts=instants(c), v=version(c))
                                             for c in CAS]))
         if self.path == '/api/choix':
